@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_notes_title">Notas</string>
+    <string name="feature_notes_search">Buscar notas</string>
+    <string name="feature_notes_clear_search">Limpar busca</string>
+    <string name="feature_notes_new_note">Nova nota</string>
+    <string name="feature_notes_open">Abrir nota</string>
+    <string name="feature_notes_delete">Apagar a nota: %1$s</string>
+    <string name="feature_notes_untitled">Sem título</string>
+    <string name="feature_notes_edited">Editada em %1$s</string>
+    <string name="feature_notes_empty">Nenhuma nota ainda. Toque em + para escrever a primeira.</string>
+    <string name="feature_notes_no_results">Nenhuma nota com “%1$s”.</string>
+    <string name="feature_notes_deleted">Nota apagada</string>
+    <string name="feature_notes_undo">Desfazer</string>
+    <string name="feature_notes_loading">Carregando notas</string>
+</resources>

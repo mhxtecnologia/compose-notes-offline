@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_editor_new_note">Nova nota</string>
+    <string name="feature_editor_edit_note">Editar nota</string>
+    <string name="feature_editor_title">Título</string>
+    <string name="feature_editor_content">Nota</string>
+    <string name="feature_editor_save_and_close">Salvar e voltar</string>
+    <string name="feature_editor_loading">Carregando a nota</string>
+</resources>

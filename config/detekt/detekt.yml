@@ -1,0 +1,33 @@
+# Parte das regras padrão do detekt (buildUponDefaultConfig) e ajusta só o que
+# conflita com as convenções do Jetpack Compose. Qualquer achado quebra o CI.
+build:
+  maxIssues: 0
+
+naming:
+  FunctionNaming:
+    # Funções @Composable que emitem UI começam com letra maiúscula.
+    ignoreAnnotated: ['Composable']
+
+complexity:
+  LongMethod:
+    ignoreAnnotated: ['Composable']
+  LongParameterList:
+    ignoreAnnotated: ['Composable']
+    ignoreDefaultParameters: true
+  CyclomaticComplexMethod:
+    ignoreAnnotated: ['Composable']
+  NestedBlockDepth:
+    ignoreAnnotated: ['Composable']
+
+style:
+  MagicNumber:
+    # Medidas em dp e cores do tema são valores de design, não números mágicos.
+    ignoreAnnotated: ['Composable', 'Preview', 'PreviewLightDark']
+    excludes:
+      - '**/test/**'
+      - '**/androidTest/**'
+      - '**/core/designsystem/**'
+  UnusedPrivateMember:
+    ignoreAnnotated: ['Preview', 'PreviewLightDark']
+  MaxLineLength:
+    maxLineLength: 120

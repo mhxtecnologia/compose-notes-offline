@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Folha com linhas de texto, dentro da zona segura de 66 dp do ícone adaptativo. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillType="evenOdd"
+        android:pathData="M42,34 L66,34 Q70,34 70,38 L70,70 Q70,74 66,74 L42,74 Q38,74 38,70 L38,38 Q38,34 42,34 Z M44,44 L64,44 L64,47 L44,47 Z M44,52 L64,52 L64,55 L44,55 Z M44,60 L56,60 L56,63 L44,63 Z" />
+</vector>

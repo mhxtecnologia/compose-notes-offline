@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_editor_new_note">New note</string>
+    <string name="feature_editor_edit_note">Edit note</string>
+    <string name="feature_editor_title">Title</string>
+    <string name="feature_editor_content">Note</string>
+    <string name="feature_editor_save_and_close">Save and go back</string>
+    <string name="feature_editor_loading">Loading note</string>
+</resources>

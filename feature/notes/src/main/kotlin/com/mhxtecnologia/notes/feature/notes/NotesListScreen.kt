@@ -18,13 +18,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -143,6 +146,7 @@ internal fun NotesListScreen(
                 else -> NotesList(
                     notes = uiState.notes,
                     onNoteClick = onNoteClick,
+                    onTogglePin = { onEvent(NotesListEvent.TogglePin(it)) },
                     onDelete = { onEvent(NotesListEvent.DeleteNote(it)) },
                 )
             }
@@ -180,6 +184,7 @@ private fun SearchField(
 private fun NotesList(
     notes: List<Note>,
     onNoteClick: (Long) -> Unit,
+    onTogglePin: (Note) -> Unit,
     onDelete: (Note) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -193,6 +198,7 @@ private fun NotesList(
             NoteCard(
                 note = note,
                 onClick = { onNoteClick(note.id) },
+                onTogglePin = { onTogglePin(note) },
                 onDelete = { onDelete(note) },
             )
         }
@@ -201,13 +207,15 @@ private fun NotesList(
 
 /**
  * Cartão de uma nota. A área de texto vira um único alvo de toque, lido pelo
- * leitor de tela como um bloco ("Abrir nota"); o botão de apagar fica separado,
- * com 48 dp e uma descrição que cita a nota.
+ * leitor de tela como um bloco ("Abrir nota"); fixar e apagar ficam separados,
+ * com 48 dp e uma descrição que cita a nota. O fixar é um toggle: o leitor de
+ * tela anuncia "ativado/desativado" em vez de trocar o texto do botão.
  */
 @Composable
 private fun NoteCard(
     note: Note,
     onClick: () -> Unit,
+    onTogglePin: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -247,11 +255,19 @@ private fun NoteCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            IconButton(onClick = onDelete, modifier = Modifier.padding(4.dp)) {
-                Icon(
-                    imageVector = Icons.Outlined.Delete,
-                    contentDescription = stringResource(R.string.feature_notes_delete, title),
-                )
+            Column(modifier = Modifier.padding(4.dp)) {
+                IconToggleButton(checked = note.isPinned, onCheckedChange = { onTogglePin() }) {
+                    Icon(
+                        imageVector = if (note.isPinned) Icons.Filled.Star else Icons.Outlined.Star,
+                        contentDescription = stringResource(R.string.feature_notes_pin, title),
+                    )
+                }
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription = stringResource(R.string.feature_notes_delete, title),
+                    )
+                }
             }
         }
     }
@@ -332,6 +348,7 @@ private val previewNotes = listOf(
         content = "Milk, eggs, coffee beans and bread for the weekend.",
         createdAt = Instant.parse("2026-11-20T10:15:00Z"),
         updatedAt = Instant.parse("2026-11-24T08:30:00Z"),
+        isPinned = true,
     ),
     Note(
         id = 2,

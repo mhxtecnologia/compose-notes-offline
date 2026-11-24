@@ -31,7 +31,11 @@ class FakeNotesRepository : NotesRepository {
         val needle = query.trim()
         list
             .filter { needle.isEmpty() || it.title.contains(needle, true) || it.content.contains(needle, true) }
-            .sortedWith(compareByDescending<Note> { it.updatedAt }.thenByDescending { it.id })
+            .sortedWith(
+                compareByDescending<Note> { it.isPinned }
+                    .thenByDescending { it.updatedAt }
+                    .thenByDescending { it.id },
+            )
     }
 
     override suspend fun getNote(id: Long): Note? = notes.value.firstOrNull { it.id == id }
@@ -42,6 +46,10 @@ class FakeNotesRepository : NotesRepository {
             ?: Note(id = nextId++, title = title, content = content, createdAt = now, updatedAt = now)
         notes.update { list -> list.filterNot { it.id == saved.id } + saved }
         return saved.id
+    }
+
+    override suspend fun setPinned(id: Long, pinned: Boolean) {
+        notes.update { list -> list.map { if (it.id == id) it.copy(isPinned = pinned) else it } }
     }
 
     override suspend fun deleteNote(id: Long) {

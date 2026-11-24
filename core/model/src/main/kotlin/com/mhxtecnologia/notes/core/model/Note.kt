@@ -12,4 +12,6 @@ data class Note(
     val content: String,
     val createdAt: Instant,
     val updatedAt: Instant,
+    /** Notas fixadas aparecem antes das outras na lista. */
+    val isPinned: Boolean = false,
 )

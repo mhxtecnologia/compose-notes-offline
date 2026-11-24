@@ -27,6 +27,10 @@ internal class OfflineFirstNotesRepository @Inject constructor(
         return noteDao.upsert(NoteEntity(title = title, content = content, createdAt = now, updatedAt = now))
     }
 
+    override suspend fun setPinned(id: Long, pinned: Boolean) {
+        noteDao.setPinned(id, pinned)
+    }
+
     override suspend fun deleteNote(id: Long) {
         noteDao.delete(id)
     }

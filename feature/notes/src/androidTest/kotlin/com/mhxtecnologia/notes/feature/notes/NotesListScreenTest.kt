@@ -3,6 +3,8 @@ package com.mhxtecnologia.notes.feature.notes
 import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsOff
+import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -89,6 +91,20 @@ class NotesListScreenTest {
             .performClick()
 
         assertEquals(listOf<NotesListEvent>(NotesListEvent.DeleteNote(groceries)), events)
+    }
+
+    @Test
+    fun pinButtonIsAToggleThatReflectsTheNoteState() {
+        val pinnedTrip = trip.copy(isPinned = true)
+        setContent(NotesListUiState(notes = listOf(pinnedTrip, groceries), isLoading = false))
+
+        composeTestRule.onNodeWithContentDescription(string(R.string.feature_notes_pin, "Trip")).assertIsOn()
+        composeTestRule
+            .onNodeWithContentDescription(string(R.string.feature_notes_pin, "Groceries"))
+            .assertIsOff()
+            .performClick()
+
+        assertEquals(listOf<NotesListEvent>(NotesListEvent.TogglePin(groceries)), events)
     }
 
     @Test

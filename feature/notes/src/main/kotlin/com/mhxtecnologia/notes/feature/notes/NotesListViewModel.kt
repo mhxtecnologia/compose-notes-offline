@@ -48,10 +48,15 @@ class NotesListViewModel @Inject constructor(
     fun onEvent(event: NotesListEvent) {
         when (event) {
             is NotesListEvent.QueryChanged -> query.value = event.query
+            is NotesListEvent.TogglePin -> togglePin(event.note)
             is NotesListEvent.DeleteNote -> delete(event.note)
             NotesListEvent.UndoDelete -> undoDelete()
             NotesListEvent.UndoDismissed -> recentlyDeleted.value = null
         }
+    }
+
+    private fun togglePin(note: Note) {
+        viewModelScope.launch { repository.setPinned(note.id, pinned = !note.isPinned) }
     }
 
     private fun delete(note: Note) {

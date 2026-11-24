@@ -75,6 +75,22 @@ class OfflineFirstNotesRepositoryTest {
     }
 
     @Test
+    fun `pinning moves a note to the top without touching its edit date`() = runTest {
+        val oldId = repository.saveNote(id = null, title = "Old", content = "")
+        clock.now = Instant.ofEpochMilli(2_000)
+        repository.saveNote(id = null, title = "New", content = "")
+
+        repository.setPinned(oldId, pinned = true)
+
+        repository.observeNotes().test {
+            val notes = awaitItem()
+            assertEquals(listOf("Old", "New"), notes.map { it.title })
+            assertEquals(listOf(true, false), notes.map { it.isPinned })
+            assertEquals(Instant.ofEpochMilli(1_000), notes.first().updatedAt)
+        }
+    }
+
+    @Test
     fun `a deleted note can be restored exactly as it was`() = runTest {
         val id = repository.saveNote(id = null, title = "Keep me", content = "please")
         val original = repository.getNote(id)!!

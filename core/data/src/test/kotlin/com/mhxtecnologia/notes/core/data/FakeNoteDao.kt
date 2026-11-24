@@ -22,7 +22,11 @@ class FakeNoteDao : NoteDao {
         val needle = pattern.unescapeLikePattern()
         entities
             .filter { needle.isEmpty() || it.title.contains(needle, true) || it.content.contains(needle, true) }
-            .sortedWith(compareByDescending<NoteEntity> { it.updatedAt }.thenByDescending { it.id })
+            .sortedWith(
+                compareByDescending<NoteEntity> { it.isPinned }
+                    .thenByDescending { it.updatedAt }
+                    .thenByDescending { it.id },
+            )
     }
 
     override suspend fun getNote(id: Long): NoteEntity? = rows.value.firstOrNull { it.id == id }
@@ -38,6 +42,12 @@ class FakeNoteDao : NoteDao {
         rows.update { current ->
             current.map { if (it.id == id) it.copy(title = title, content = content, updatedAt = updatedAt) else it }
         }
+        return 1
+    }
+
+    override suspend fun setPinned(id: Long, pinned: Boolean): Int {
+        if (rows.value.none { it.id == id }) return 0
+        rows.update { current -> current.map { if (it.id == id) it.copy(isPinned = pinned) else it } }
         return 1
     }
 

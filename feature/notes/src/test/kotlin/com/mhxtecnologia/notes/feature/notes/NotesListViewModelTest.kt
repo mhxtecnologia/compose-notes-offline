@@ -59,6 +59,19 @@ class NotesListViewModelTest {
     }
 
     @Test
+    fun `pinning a note moves it to the top, and unpinning puts it back`() = runTest {
+        val old = note(1, "Old", editedAt = 1_000)
+        repository.setNotes(old, note(2, "New", editedAt = 2_000))
+        collectUiState()
+
+        viewModel.onEvent(NotesListEvent.TogglePin(old))
+        assertEquals(listOf("Old", "New"), viewModel.uiState.value.notes.map { it.title })
+
+        viewModel.onEvent(NotesListEvent.TogglePin(viewModel.uiState.value.notes.first()))
+        assertEquals(listOf("New", "Old"), viewModel.uiState.value.notes.map { it.title })
+    }
+
+    @Test
     fun `deleting a note removes it and offers undo, which brings it back`() = runTest {
         val groceries = note(1, "Groceries")
         repository.setNotes(groceries, note(2, "Trip"))

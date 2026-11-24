@@ -44,6 +44,18 @@ class NoteDaoTest {
     }
 
     @Test
+    fun observeNotes_listsPinnedNotesFirst() = runTest {
+        dao.upsert(note(title = "Recent", updatedAt = 9_000))
+        val pinnedId = dao.upsert(note(title = "Pinned but old", updatedAt = 1_000))
+
+        dao.setPinned(pinnedId, pinned = true)
+
+        val titles = dao.observeNotes(pattern = "").first().map { it.title }
+        assertEquals(listOf("Pinned but old", "Recent"), titles)
+        assertEquals(1_000L, dao.getNote(pinnedId)?.updatedAt)
+    }
+
+    @Test
     fun observeNotes_matchesTitleOrContentIgnoringCase() = runTest {
         dao.upsert(note(title = "Groceries", content = "milk and eggs"))
         dao.upsert(note(title = "Trip", content = "Buy MILK for the road"))

@@ -14,6 +14,7 @@ data class NotesListUiState(
 /** Tudo o que a tela da lista pode pedir ao ViewModel (fluxo unidirecional). */
 sealed interface NotesListEvent {
     data class QueryChanged(val query: String) : NotesListEvent
+    data class TogglePin(val note: Note) : NotesListEvent
     data class DeleteNote(val note: Note) : NotesListEvent
     data object UndoDelete : NotesListEvent
     data object UndoDismissed : NotesListEvent

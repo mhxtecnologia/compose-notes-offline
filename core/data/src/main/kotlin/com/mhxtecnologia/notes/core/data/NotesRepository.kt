@@ -22,6 +22,9 @@ interface NotesRepository {
      */
     suspend fun saveNote(id: Long?, title: String, content: String): Long
 
+    /** Fixa ou solta a nota no topo da lista, sem mexer na data de edição. */
+    suspend fun setPinned(id: Long, pinned: Boolean)
+
     suspend fun deleteNote(id: Long)
 
     /** Devolve uma nota apagada exatamente como estava (ação de desfazer). */

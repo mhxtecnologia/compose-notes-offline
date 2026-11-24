@@ -5,6 +5,7 @@
     <string name="feature_notes_clear_search">Limpar busca</string>
     <string name="feature_notes_new_note">Nova nota</string>
     <string name="feature_notes_open">Abrir nota</string>
+    <string name="feature_notes_pin">Fixar a nota: %1$s</string>
     <string name="feature_notes_delete">Apagar a nota: %1$s</string>
     <string name="feature_notes_untitled">Sem título</string>
     <string name="feature_notes_edited">Editada em %1$s</string>

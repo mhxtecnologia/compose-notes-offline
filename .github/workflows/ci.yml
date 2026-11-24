@@ -1,0 +1,120 @@
+# Integração contínua: detekt, Android Lint, testes unitários, APK debug
+# (publicado como artefato) e testes instrumentados num emulador, onde rodam
+# os testes de UI do Compose, do DAO e da migration do Room.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Detekt, lint, unit tests and APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: gradle/actions/wrapper-validation@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Detekt
+        run: ./gradlew detekt
+
+      - name: Android Lint
+        run: ./gradlew lintDebug
+
+      - name: Unit tests
+        run: ./gradlew testDebugUnitTest
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: compose-notes-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+
+      # O KSP do Room exporta o esquema a cada build. Se o arquivo gerado não
+      # estiver no git, a versão nova do banco ficou sem esquema versionado.
+      - name: Upload Room schemas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: room-schemas
+          path: core/database/schemas
+          if-no-files-found: ignore
+
+      - name: Room schemas are committed
+        run: |
+          changes="$(git status --porcelain -- core/database/schemas)"
+          if [ -n "$changes" ]; then
+            echo "$changes"
+            git diff -- core/database/schemas
+            echo "::error::The Room schema changed. Commit the files exported to core/database/schemas."
+            exit 1
+          fi
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-reports
+          path: |
+            build/reports/detekt/
+            **/build/reports/lint-results-*.html
+            **/build/reports/tests/
+
+  instrumented:
+    name: Instrumented tests (emulator)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      # Compila antes de ligar o emulador, para ele não ficar ocioso esperando o Gradle.
+      - name: Build test APKs
+        run: ./gradlew assembleDebugAndroidTest
+
+      # Só o build debug (pacote .debug) e os APKs de teste vão para o emulador:
+      # nada roda sobre o pacote de produção.
+      - name: Run instrumented tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          target: default
+          disable-animations: true
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: ./gradlew connectedDebugAndroidTest
+
+      - name: Upload instrumented test reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: instrumented-test-reports
+          path: '**/build/reports/androidTests/'
